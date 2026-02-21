@@ -1,90 +1,36 @@
 package Model;
 
-
-import Model.Usuario;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 public class Prestamo {
-    private LocalDateTime fechaInicio;
-    private LocalDateTime fechaFin;
-    private LocalDate fechaDevolucion;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin; // Límite de 30 días
     private LocalDate fechaDevolucionReal;
-    private Model.Libro libro;
+    private Libro libro;
     private Usuario usuario;
 
-    public LocalDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
     public Prestamo(Usuario usuario, Libro libro) {
-        this.libro = libro;
         this.usuario = usuario;
-    }
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDateTime getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDateTime fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public LocalDate getFechaDevolucion() {
-        return fechaDevolucion;
-    }
-
-    public void setFechaDevolucion(LocalDate fechaDevolucion) {
-        this.fechaDevolucion = fechaDevolucion;
-    }
-
-    public Libro getLibro() {
-        return libro;
-    }
-
-    public void setLibro(Libro libro) {
         this.libro = libro;
+        this.fechaInicio = LocalDate.now();
+        this.fechaFin = this.fechaInicio.plusDays(30);
     }
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public LocalDate getFechaFin() { return fechaFin; }
+    public LocalDate getFechaDevolucionReal() { return fechaDevolucionReal; }
+    public Libro getLibro() { return libro; }
+    public Usuario getUsuario() { return usuario; }
 
     public void registrarDevolucion(LocalDate fechaReal) {
         this.fechaDevolucionReal = fechaReal;
     }
 
-
-
-
-
-    public boolean vendido() {
+    public boolean estaVencido() {
         if (this.fechaDevolucionReal == null) {
-            return LocalDate.now().isAfter(ChronoLocalDate.from(this.fechaFin));
+            return LocalDate.now().isAfter(this.fechaFin);
         }
-
-        return this.fechaDevolucionReal.isAfter(ChronoLocalDate.from(this.fechaFin));
-    }
-
-
-
-
-    public long calcularDiasDeRetraso() {
-        if (vendido() && this.fechaDevolucionReal != null) {
-            return ChronoUnit.DAYS.between(this.fechaFin, this.fechaDevolucionReal);
-        }
-
-        return 0;
+        return this.fechaDevolucionReal.isAfter(this.fechaFin);
     }
 }

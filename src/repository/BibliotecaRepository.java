@@ -3,80 +3,77 @@ package repository;
 import Model.Libro;
 import Model.Prestamo;
 import Model.Usuario;
+import Model.Genero;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BibliotecaRepository {
 
-    private List<Libro> catalogoLibros;
-    private List<Usuario> usuariosRegistrados;
-    private List<Prestamo> prestamosActivos;
-    private List<Prestamo> historialPrestamos;
+    private List<Libro> catalogoLibros = new ArrayList<>();
+    private List<Usuario> usuariosRegistrados = new ArrayList<>();
+    private List<Prestamo> prestamosActivos = new ArrayList<>();
+    private List<Prestamo> historialPrestamos = new ArrayList<>();
 
-    public BibliotecaRepository() {
-        this.catalogoLibros = new ArrayList<>();
-        this.usuariosRegistrados = new ArrayList<>();
-        this.prestamosActivos = new ArrayList<>();
-        this.historialPrestamos = new ArrayList<>();
-    }
+    public void agregarLibro(Libro libro) { catalogoLibros.add(libro); }
+    public void registrarUsuario(Usuario usuario) { usuariosRegistrados.add(usuario); }
 
     public Libro buscarLibroPorIsbn(String isbn) {
         for (Libro libro : catalogoLibros) {
-            if (libro.getIsbn().equals(isbn)) {
-                return libro;
-            }
+            if (libro.getISBN().equals(isbn)) return libro;
+        }
+        return null;
+    }
+
+    public Libro buscarLibroPorTitulo(String titulo) {
+        for (Libro libro : catalogoLibros) {
+            if (libro.getTitulo().equalsIgnoreCase(titulo)) return libro;
         }
         return null;
     }
 
     public Usuario buscarUsuarioPorId(String idUsuario) {
         for (Usuario usuario : usuariosRegistrados) {
-            if (usuario.getUsuario().equals(idUsuario)) {
-                return usuario;
-            }
+            if (usuario.getIdUsuario().equals(idUsuario)) return usuario;
         }
-
         return null;
     }
 
-    public List<Libro> filtrarLibrosPorGenero(String genero) {
+    public List<Libro> filtrarLibrosPorGenero(Genero genero) {
         List<Libro> encontrados = new ArrayList<>();
         for (Libro libro : catalogoLibros) {
-            if (libro.getGenero().equalsIgnoreCase(genero)) {
-                encontrados.add(libro);
-            }
+            if (libro.getGenero() == genero) encontrados.add(libro);
         }
         return encontrados;
     }
 
-    public void registrarNuevoPrestamo(Prestamo prestamo) {
-        prestamosActivos.add(prestamo);
-    }
+    public void registrarNuevoPrestamo(Prestamo prestamo) { prestamosActivos.add(prestamo); }
 
     public void moverPrestamoAHistorial(Prestamo prestamo) {
         prestamosActivos.remove(prestamo);
         historialPrestamos.add(prestamo);
     }
 
-    public List<Prestamo> obtenerHistorialDeUsuario(String idUsuario) {
-        List<Prestamo> historialDelUsuario = new ArrayList<>();
-        for (Prestamo prestamo : historialPrestamos) {
-            if (prestamo.getUsuario().getIdUsuario().equals(idUsuario)) {
-                historialDelUsuario.add(prestamo);
-            }
-        }
-        return historialDelUsuario;
-    }
-
-
-    public Prestamo buscarPrestamo(String idUsuarios, String ISBN) {
+    public Prestamo buscarPrestamoActivo(String idUsuario, String ISBN) {
         for (Prestamo prestamo : prestamosActivos) {
-            if (prestamo.getUsuario().equals(idUsuarios) && prestamo.getLibro().getISBN().equals(ISBN)) {
+            if (prestamo.getUsuario().getIdUsuario().equals(idUsuario) && prestamo.getLibro().getISBN().equals(ISBN)) {
                 return prestamo;
             }
         }
-
         return null;
     }
+
+    public List<Prestamo> obtenerHistorialPrestamosPorUsuarioYLibro(String idUsuario, String isbn) {
+        List<Prestamo> filtrados = new ArrayList<>();
+        for (Prestamo p : historialPrestamos) {
+            if (p.getUsuario().getIdUsuario().equals(idUsuario) && p.getLibro().getISBN().equals(isbn)) {
+                filtrados.add(p);
+            }
+        }
+        return filtrados;
+    }
+
+    public List<Libro> obtenerTodosLosLibros() { return catalogoLibros; }
+    public List<Usuario> obtenerTodosLosUsuarios() { return usuariosRegistrados; }
+    public List<Prestamo> obtenerPrestamosActivos() { return prestamosActivos; }
 }
